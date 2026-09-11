@@ -1,0 +1,17 @@
+# 依赖、缓存与构建产物由工具生成，不手工格式化。
+node_modules/
+**/.vitepress/cache/
+**/.vitepress/dist/
+coverage/
+package-lock.json
+
+# 本地环境、编辑器配置及协作资料不参与项目格式化。
+.env*
+*.local
+*.log
+.git/
+.idea/
+.vscode/
+.codex/
+.agents/
+AGENTS.md

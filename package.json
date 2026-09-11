@@ -7,9 +7,14 @@
   "scripts": {
     "dev": "vitepress dev .",
     "build": "vitepress build .",
-    "preview": "vitepress preview ."
+    "preview": "vitepress preview .",
+    "test": "node --test tests/*.test.mjs",
+    "check:build": "node tests/check-build.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "devDependencies": {
+    "prettier": "3.9.6",
     "vitepress": "1.6.4",
     "vue": "3.5.42"
   }
