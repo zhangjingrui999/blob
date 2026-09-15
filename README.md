@@ -18,7 +18,8 @@ npm run check:build
 
 Prettier 作为固定版本的开发依赖安装，配置入口为 `.prettierrc.json`，忽略规则为 `.prettierignore`。
 
-规则采用 2 空格缩进、JS 单引号、不加分号、不保留尾逗号、LF 换行和 100 字符目标行宽。Markdown 保留原有段落换行，Vue 的 script 与 style 内容不额外缩进。
+规则采用 2 空格缩进、JS 单引号、不加分号、不保留尾逗号、LF 换行和 100 字符目标行宽。Markdown 保留原有段落换行，Vue 的 script 与
+style 内容不额外缩进。
 
 ```sh
 # 检查项目格式，不修改文件
@@ -60,7 +61,8 @@ order: 10
 ---
 ```
 
-`type`、`module`、`tags`、`relatedModules` 引用集中配置中的 ID。领域由模块派生，不需要重复填写。`relatedModules` 可选；`order` 越小越靠前。`example: true` 标记示例文章。现有文章均为可替换的入门或场景示例，无虚构发布日期。
+`type`、`module`、`tags`、`relatedModules` 引用集中配置中的 ID。领域由模块派生，不需要重复填写。`relatedModules` 可选；`order`
+越小越靠前。`example: true` 标记示例文章。现有文章均为可替换的入门或场景示例，无虚构发布日期。
 
 文章必须有标题和摘要。构建时检查无效分类、模块、关联模块和标签引用。未注册标签先加入集中配置，再绑定文章；页面上的候选标签由当前范围内文章自动去重汇总。
 
@@ -87,6 +89,7 @@ order: 10
 
 ## 部署路径
 
-保留 `.html` 页面链接，模块页面在构建时实际生成，可直接访问或刷新。通过 `PAGES_BASE_PATH` 设置 GitHub Pages 子路径；不设置时为根路径。页面内部链接统一经过 `withBase` 处理。
+保留 `.html` 页面链接，模块页面在构建时实际生成，可直接访问或刷新。通过 `PAGES_BASE_PATH` 设置 GitHub Pages
+子路径；不设置时为根路径。页面内部链接统一经过 `withBase` 处理。
 
 内容源与协作说明分离，`README.md`、`AGENTS.md` 和测试文件不会生成公开页面。构建产物不得手工修改。
