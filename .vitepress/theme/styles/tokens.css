@@ -1,0 +1,35 @@
+:root {
+  --blog-font: 'Inter', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', system-ui, sans-serif;
+  --blog-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  --blog-bg: #f7f9fc;
+  --blog-panel: #fff;
+  --blog-text: #1c293e;
+  --blog-muted: #69788d;
+  --blog-accent: #176bdb;
+  --blog-teal: #168576;
+  --blog-soft: #eaf2ff;
+  --blog-line: #e2e8f1;
+  --blog-shadow: #3269aa12;
+  --blog-grid: #376cc107;
+  --blog-radius: 13px;
+  --vp-font-family-base: var(--blog-font);
+  --vp-font-family-mono: var(--blog-mono);
+  --vp-c-brand-1: var(--blog-accent);
+  --vp-c-brand-2: #3684eb;
+  --vp-c-brand-3: #176bdb;
+  --vp-c-bg: var(--blog-bg);
+}
+.dark {
+  --blog-bg: #0d1422;
+  --blog-panel: #141e30;
+  --blog-text: #e4eaf6;
+  --blog-muted: #9aaac1;
+  --blog-accent: #7aafff;
+  --blog-teal: #69caba;
+  --blog-soft: #1c304d;
+  --blog-line: #26364e;
+  --blog-shadow: #00000030;
+  --blog-grid: #86b4f509;
+  --vp-c-brand-2: #91bdff;
+  --vp-c-brand-3: #4486e8;
+}
