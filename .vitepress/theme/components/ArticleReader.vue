@@ -3,26 +3,33 @@ import { computed } from 'vue';
 import { useData, withBase } from 'vitepress';
 import { data as articles } from '../../data/articles.data.js';
 import { label, moduleUrl } from '../../content.config.js';
+import { searchPath } from '../utils/navigation.js';
 import { searchQuery } from '../utils/search.js';
 
+const props = defineProps({ contentType: { type: String, required: true } });
 const { frontmatter, page } = useData();
 const siblings = computed(() =>
-    articles.filter(article => article.type === frontmatter.value.type && article.module === frontmatter.value.module)
+    articles.filter(article => article.type === props.contentType && article.module === frontmatter.value.module)
 );
 const headers = computed(() => page.value.headers || []);
+const searchUrl = computed(() => withBase(searchPath(props.contentType)));
+const moduleSearchUrl = computed(() => searchUrl.value + searchQuery({ module: frontmatter.value.module }));
+const moduleHref = computed(() =>
+    props.contentType === 'basics' ? withBase(moduleUrl(frontmatter.value.module)) : moduleSearchUrl.value
+);
 </script>
 <template>
     <nav class="breadcrumbs" aria-label="面包屑">
-        <a :href="withBase(`/${frontmatter.type}/`)">{{ label(frontmatter.type) }}</a>
+        <a :href="withBase(`/${contentType}/`)">{{ label(contentType) }}</a>
         <span>/</span>
-        <a :href="withBase(moduleUrl(frontmatter.module))">{{ label(frontmatter.module) }}</a>
+        <a :href="moduleHref">{{ label(frontmatter.module) }}</a>
         <span>/</span>
         <span>正文</span>
     </nav>
     <div class="reading-layout">
         <aside class="reading-sidebar">
             <details open>
-                <summary>{{ label(frontmatter.module) }} · {{ label(frontmatter.type) }}</summary>
+                <summary>{{ label(frontmatter.module) }} · {{ label(contentType) }}</summary>
                 <nav aria-label="同模块文章">
                     <a
                         v-for="article in siblings"
@@ -33,21 +40,18 @@ const headers = computed(() => page.value.headers || []);
                     >
                 </nav>
             </details>
-            <a class="text-link" :href="withBase('/search.html') + searchQuery({ module: frontmatter.module })"
-                >搜索本模块 ↗</a
-            >
+            <a class="text-link" :href="moduleSearchUrl">搜索本模块 ↗</a>
         </aside>
         <article class="reading-paper">
             <div class="reading-meta">
-                <span class="eyebrow">{{ label(frontmatter.type) }} / {{ label(frontmatter.module) }}</span>
+                <span class="eyebrow">{{ label(contentType) }} / {{ label(frontmatter.module) }}</span>
                 <span v-if="frontmatter.example" class="sample-badge">示例文章</span>
             </div>
+            <slot name="before-content" />
             <Content class="vp-doc" />
+            <slot name="after-content" />
             <div v-if="frontmatter.tags?.length" class="reading-tags">
-                <a
-                    v-for="tag in frontmatter.tags"
-                    :key="tag"
-                    :href="withBase('/search.html') + searchQuery({ type: 'experience', tags: [tag] })"
+                <a v-for="tag in frontmatter.tags" :key="tag" :href="searchUrl + searchQuery({ tags: [tag] })"
                     ># {{ label(tag) }}</a
                 >
             </div>

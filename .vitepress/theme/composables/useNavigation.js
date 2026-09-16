@@ -1,7 +1,7 @@
 import { computed, inject, onMounted, onUnmounted, provide, shallowRef } from 'vue';
 import { useData, useRouter, withBase } from 'vitepress';
-import { findModule } from '../../content.config.js';
-import { parseSearch, searchQuery } from '../utils/search.js'; // 使用独立注入键，避免与其他组件提供的上下文重名。
+import { resolveSearchContext, searchPath } from '../utils/navigation.js';
+import { parseSearch, searchQuery } from '../utils/search.js';
 
 // 使用独立注入键，避免与其他组件提供的上下文重名。
 const navigationKey = Symbol('blog-navigation');
@@ -13,12 +13,8 @@ export function provideNavigation() {
     // 状态归属当前布局实例，不放在模块顶层，避免服务端渲染时跨请求共享。
     const query = shallowRef('');
     const searchState = computed(() => parseSearch(query.value));
-    // 搜索范围优先取文章模块，其次取动态模块页参数，最后取当前搜索条件。
-    const context = computed(
-        () =>
-            findModule(frontmatter.value.module || params.value?.module || searchState.value.module) ||
-            (searchState.value.area ? { area: searchState.value.area } : null)
-    );
+    // 页面类型与文章模块共同限定范围，入口页也能只搜索当前内容类型。
+    const context = computed(() => resolveSearchContext(frontmatter.value, params.value || {}, searchState.value));
     let previousHook, installedHook;
     function sync() {
         query.value = window.location.search;
@@ -42,7 +38,7 @@ export function provideNavigation() {
         window.removeEventListener('popstate', sync);
     });
     /** 客户端交互入口：生成带部署前缀的搜索地址，并同步页面状态。 */
-    function search(state, path = '/search.html') {
+    function search(state, path = searchPath(state.type)) {
         const target = withBase(path) + searchQuery(state);
         if (window.location.pathname === withBase(path)) {
             // 同页筛选只追加历史记录，不重新加载页面，避免滚动位置跳回顶部。

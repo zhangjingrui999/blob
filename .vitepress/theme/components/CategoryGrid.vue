@@ -34,9 +34,6 @@ import { categories, moduleUrl } from '../../content.config.js';
 </template>
 
 <style scoped>
-.category-symbol {
-    white-space: nowrap;
-}
 .category-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -62,6 +59,7 @@ import { categories, moduleUrl } from '../../content.config.js';
     margin-bottom: 25px;
 }
 .category-symbol {
+    white-space: nowrap;
     width: 42px;
     height: 42px;
     display: grid;
@@ -93,8 +91,12 @@ import { categories, moduleUrl } from '../../content.config.js';
 .category-modules {
     display: flex;
     align-items: flex-start;
+    align-content: flex-start;
     gap: 8px;
     flex-wrap: wrap;
+    /* 限制模块标签区域高度，避免标签增多时撑高整行分类卡片。 */
+    max-height: 144px;
+    overflow: hidden;
 }
 .category-modules a {
     display: inline-flex;

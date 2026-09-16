@@ -1,6 +1,7 @@
 <script setup>
 import { withBase } from 'vitepress';
 import { label } from '../../content.config.js';
+import { searchPath } from '../utils/navigation.js';
 import { searchQuery } from '../utils/search.js';
 
 defineProps({
@@ -30,7 +31,7 @@ defineProps({
                     <a
                         v-for="tag in article.tags"
                         :key="tag"
-                        :href="withBase('/search.html') + searchQuery({ type: 'experience', tags: [tag] })"
+                        :href="withBase(searchPath(article.type)) + searchQuery({ tags: [tag] })"
                         ># {{ label(tag) }}</a
                     >
                 </div>

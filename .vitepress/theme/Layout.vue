@@ -1,14 +1,19 @@
 <script setup>
-import { defineAsyncComponent } from 'vue';
 import { useData, withBase } from 'vitepress';
 import { provideNavigation } from './composables/useNavigation.js';
 import AppHeader from './components/AppHeader.vue';
 import HomePage from './pages/HomePage.vue';
-import KnowledgePage from './pages/KnowledgePage.vue';
-import ModulePage from './pages/ModulePage.vue';
-import ArticlePage from './pages/ArticlePage.vue';
+import AppFooter from './components/AppFooter.vue';
+import BasicsIndexPage from './pages/basics/BasicsIndexPage.vue';
+import BasicsModulePage from './pages/basics/BasicsModulePage.vue';
+import BasicsDetailPage from './pages/basics/BasicsDetailPage.vue';
+import ExperienceIndexPage from './pages/experience/ExperienceIndexPage.vue';
+import ExperienceDetailPage from './pages/experience/ExperienceDetailPage.vue';
 
-const SearchPage = defineAsyncComponent(() => import('./pages/SearchPage.vue'));
+// 页面壳同步挂载，避免 URL 状态先更新而异步页面尚未完成 hydration；全文索引仍按需加载。
+import GlobalSearchPage from './pages/GlobalSearchPage.vue';
+import BasicsSearchPage from './pages/basics/BasicsSearchPage.vue';
+import ExperienceSearchPage from './pages/experience/ExperienceSearchPage.vue';
 const { frontmatter, page } = useData();
 provideNavigation();
 </script>
@@ -25,20 +30,16 @@ provideNavigation();
                 <a class="button button-primary" :href="withBase('/')">返回首页</a>
             </div>
             <HomePage v-else-if="frontmatter.pageKind === 'home'" />
-            <KnowledgePage v-else-if="frontmatter.pageKind === 'knowledge'" />
-            <ModulePage v-else-if="frontmatter.pageKind === 'module'" />
-            <SearchPage v-else-if="['search', 'experience'].includes(frontmatter.pageKind)" />
-            <ArticlePage v-else-if="frontmatter.type" />
+            <BasicsIndexPage v-else-if="frontmatter.pageKind === 'knowledge'" />
+            <BasicsModulePage v-else-if="frontmatter.pageKind === 'module'" />
+            <ExperienceIndexPage v-else-if="frontmatter.pageKind === 'experience'" />
+            <BasicsSearchPage v-else-if="frontmatter.pageKind === 'search' && frontmatter.type === 'basics'" />
+            <ExperienceSearchPage v-else-if="frontmatter.pageKind === 'search' && frontmatter.type === 'experience'" />
+            <GlobalSearchPage v-else-if="frontmatter.pageKind === 'search'" />
+            <BasicsDetailPage v-else-if="frontmatter.type === 'basics'" />
+            <ExperienceDetailPage v-else-if="frontmatter.type === 'experience'" />
             <Content v-else class="vp-doc" />
         </main>
-        <footer class="site-footer">
-            <div class="footer-inner">
-                <a :href="withBase('/')"
-                    >&lt;/&gt; Code Blog
-                    <span>一个菜鸟程序员的脚步</span>
-                </a>
-                <span>用记录连接知识 · 用实践积累经验</span>
-            </div>
-        </footer>
+        <AppFooter />
     </div>
 </template>

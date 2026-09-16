@@ -1,9 +1,12 @@
 <script setup>
 import { computed, nextTick, onMounted, onUnmounted, shallowRef, useTemplateRef, watch } from 'vue';
 import { useData, useRoute, withBase } from 'vitepress';
-import { categories, contentTypes, label } from '../../content.config.js';
+import { contentTypes, modules } from '../../content.config.js';
 import { useNavigation } from '../composables/useNavigation.js';
+import { pageContentType } from '../utils/navigation.js';
 import SearchForm from './SearchForm.vue';
+import AppSelect from './AppSelect.vue';
+import ModuleScopePicker from './ModuleScopePicker.vue';
 
 const { isDark, frontmatter } = useData();
 const route = useRoute();
@@ -11,7 +14,16 @@ const { context, searchState, search } = useNavigation();
 const menuOpen = shallowRef(false);
 const dialog = useTemplateRef('dialog');
 const form = useTemplateRef('form');
-const scope = shallowRef('all');
+const scopeType = shallowRef('');
+const typeOptions = [
+    { value: '', label: '全站内容' },
+    ...contentTypes.map(type => ({ value: type.id, label: type.name }))
+];
+const scopeModules = shallowRef([]);
+const scopeError = shallowRef('');
+// 主题偏好来自浏览器，挂载前保持与静态 HTML 相同的按钮文字，避免深色模式刷新时 hydration 不一致。
+const mounted = shallowRef(false);
+const themeDark = computed(() => mounted.value && isDark.value);
 const navItems = computed(() => [
     { id: 'home', name: '首页', url: '/' },
     ...contentTypes.map(item => ({
@@ -19,22 +31,26 @@ const navItems = computed(() => [
         url: `/${item.id}/`
     }))
 ]);
-const activeNav = computed(
-    () =>
-        frontmatter.value.type ||
-        {
-            knowledge: 'basics',
-            module: 'basics'
-        }[frontmatter.value.pageKind] ||
-        frontmatter.value.pageKind
-);
+const activeNav = computed(() => pageContentType(frontmatter.value) || frontmatter.value.pageKind);
 let opener,
     previousOverflow = '';
 
 async function openSearch() {
     if (dialog.value?.open) return;
     opener = document.activeElement;
-    scope.value = context.value ? 'current' : 'all';
+    scopeType.value = context.value?.type || '';
+    // 文章和模块页优先当前模块，搜索页恢复已选范围；入口页没有具体范围时全选。
+    const current = context.value;
+    scopeModules.value = current?.modules?.length
+        ? [...current.modules]
+        : modules
+              .filter(
+                  item =>
+                      (!current?.area || item.area === current.area) &&
+                      (!current?.group || item.group === current.group)
+              )
+              .map(item => item.id);
+    scopeError.value = '';
     menuOpen.value = false;
     previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
@@ -51,16 +67,27 @@ function closed() {
 function closeSearch() {
     dialog.value?.close();
 }
-
-function submit(q) {
-    const range = scope.value === 'current' ? context.value : null;
-    closeSearch();
-    search({ q, area: range?.area || '', module: range?.id || '', tags: [] });
+function clickBackdrop(event) {
+    if (event.target === dialog.value) closeSearch();
 }
 
-function shortcut(area) {
+function submit(q) {
+    if (!scopeModules.value.length) {
+        scopeError.value = '请至少选择一个模块。';
+        return;
+    }
     closeSearch();
-    search({ area, tags: [] });
+    // 全选省略模块限制，其他选择使用重复 module 参数；不带入旧领域和分组。
+    search({
+        q,
+        type: scopeType.value,
+        modules: scopeModules.value.length === modules.length ? [] : scopeModules.value,
+        tags: []
+    });
+}
+function updateModules(ids) {
+    scopeModules.value = ids;
+    scopeError.value = '';
 }
 
 function keyboard(event) {
@@ -77,7 +104,10 @@ watch(
         if (dialog.value?.open) closeSearch();
     }
 );
-onMounted(() => window.addEventListener('keydown', keyboard));
+onMounted(() => {
+    mounted.value = true;
+    window.addEventListener('keydown', keyboard);
+});
 onUnmounted(() => {
     window.removeEventListener('keydown', keyboard);
     if (dialog.value?.open) document.body.style.overflow = previousOverflow;
@@ -111,10 +141,10 @@ onUnmounted(() => {
                 </button>
                 <button
                     class="icon-button"
-                    :aria-label="isDark ? '切换浅色模式' : '切换深色模式'"
+                    :aria-label="themeDark ? '切换浅色模式' : '切换深色模式'"
                     @click="isDark = !isDark"
                 >
-                    {{ isDark ? '☀' : '◐' }}
+                    {{ themeDark ? '☀' : '◐' }}
                 </button>
                 <button
                     class="icon-button menu-trigger"
@@ -142,11 +172,7 @@ onUnmounted(() => {
         class="search-dialog"
         aria-labelledby="search-dialog-title"
         @close="closed"
-        @click="
-            event => {
-                if (event.target === dialog) closeSearch();
-            }
-        "
+        @click="clickBackdrop"
     >
         <div class="dialog-heading">
             <div>
@@ -156,23 +182,12 @@ onUnmounted(() => {
             <button class="icon-button" aria-label="关闭搜索" @click="closeSearch">×</button>
         </div>
         <SearchForm ref="form" :query="searchState.q" @submit="submit" />
-        <label v-if="context" class="scope-label"
-            >搜索范围
-            <select v-model="scope">
-                <option value="current">
-                    当前{{ context.id ? '模块' : '领域' }}：{{ label(context.id || context.area) }}
-                </option>
-                <option value="all">全站</option>
-            </select>
-        </label>
-        <p v-else class="muted small">搜索范围：全站</p>
-        <p class="muted small">快捷分类</p>
-        <div class="chip-group">
-            <button v-for="area in categories" :key="area.id" class="chip" @click="shortcut(area.id)">
-                {{ area.name }}
-                <span aria-hidden="true">↗</span>
-            </button>
+        <div class="scope-label">
+            <span>内容类型</span>
+            <AppSelect v-model="scopeType" :options="typeOptions" label="搜索内容类型" />
         </div>
+        <ModuleScopePicker :selected="scopeModules" @change="updateModules" />
+        <p v-if="scopeError" role="alert" class="scope-error">{{ scopeError }}</p>
         <div class="dialog-footer">
             <span>支持中文关键词与英文近似拼写</span>
             <span> <kbd>Esc</kbd> 关闭 </span>
@@ -181,6 +196,11 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+.scope-error {
+    color: var(--blog-accent);
+    font-size: 13px;
+    margin: 12px 0;
+}
 .site-header {
     position: sticky;
     top: 0;
@@ -310,14 +330,6 @@ onUnmounted(() => {
     gap: 12px;
     font-size: 13px;
     margin: 20px 0;
-}
-
-.scope-label select {
-    padding: 8px;
-    border: 1px solid var(--blog-line);
-    border-radius: 6px;
-    background: var(--blog-bg);
-    color: var(--blog-text);
 }
 
 .dialog-footer {

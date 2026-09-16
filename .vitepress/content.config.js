@@ -1,9 +1,10 @@
 // 内容类型、分类树和标签的唯一维护入口，页面组件只读取或派生这些数据。
 // ID 用于文章元数据和链接；修改 name 不改变公开 URL，修改 ID 则需同步引用。
 // 内容类型区分系统学习与实践记录，两种类型共用下面的技术分类树。
+// grouped 控制是否展示中间分组：经验直接按领域和模块查找，基础知识保留完整层级。
 export const contentTypes = [
-    { id: 'basics', name: '基础知识', description: '从概念到原理，建立自己的知识体系。' },
-    { id: 'experience', name: '经验', description: '记录问题、实践与解决思路。' }
+    { id: 'basics', name: '基础知识', description: '从概念到原理，建立自己的知识体系。', grouped: true },
+    { id: 'experience', name: '经验分享', description: '记录问题、实践与解决思路。', grouped: false }
 ];
 
 // 分类层级为“领域 → 模块”或“领域 → 分组 → 模块”；末级节点才可绑定文章。

@@ -1,3 +1,7 @@
+.content-section {
+    margin-top: 32px;
+}
+
 .site-container {
     width: 100%;
     max-width: 1240px;
@@ -18,7 +22,7 @@
     font-size: 23px;
     line-height: 1.5;
     margin-top: 8px;
-    letter-spacing: -.5px;
+    letter-spacing: -0.5px;
 }
 
 .section-heading > .text-link {
@@ -34,7 +38,7 @@
     font-size: 36px;
     line-height: 1.45;
     margin: 12px 0;
-    letter-spacing: -.8px;
+    letter-spacing: -0.8px;
 }
 
 .page-heading p {

@@ -3,13 +3,14 @@ import { computed } from 'vue';
 import { withBase } from 'vitepress';
 import { data as articles } from '../../data/articles.data.js';
 import { label } from '../../content.config.js';
+import { searchPath } from '../utils/navigation.js';
 import { collectTags, searchQuery } from '../utils/search.js';
 import HomeHero from '../components/HomeHero.vue';
 import CategoryGrid from '../components/CategoryGrid.vue';
 import ArticleList from '../components/ArticleList.vue';
 
 const experiences = computed(() => articles.filter(article => article.type === 'experience').slice(0, 3));
-const tags = computed(() => collectTags(articles).slice(0, 8));
+const tags = computed(() => collectTags(articles, { type: 'experience' }).slice(0, 8));
 </script>
 <template>
     <HomeHero />
@@ -29,7 +30,7 @@ const tags = computed(() => collectTags(articles).slice(0, 8));
                 <span class="eyebrow">02 / EXPERIENCE</span>
                 <h2>在实践中积累</h2>
             </div>
-            <a class="text-link" :href="withBase('/experience/')">全部经验 ↗</a>
+            <a class="text-link" :href="withBase('/experience/')">全部经验分享 ↗</a>
         </div>
         <div class="experience-layout">
             <ArticleList :articles="experiences" />
@@ -42,7 +43,10 @@ const tags = computed(() => collectTags(articles).slice(0, 8));
                         <a
                             v-for="tag in tags"
                             :key="tag.name"
-                            :href="withBase('/search.html') + searchQuery({ type: 'experience', tags: [tag.name] })"
+                            :href="
+                                withBase(searchPath('experience')) +
+                                searchQuery({ type: 'experience', tags: [tag.name] })
+                            "
                         >
                             <span># {{ label(tag.name) }}</span>
                             <span>{{ tag.count }} ↗</span>
