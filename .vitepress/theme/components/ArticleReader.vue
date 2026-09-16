@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { useData, withBase } from 'vitepress';
 import { data as articles } from '../../data/articles.data.js';
-import { label, moduleUrl } from '../../content.config.js';
+import { label, moduleUrl } from '../content.js';
 import { searchPath } from '../utils/navigation.js';
 import { searchQuery } from '../utils/search.js';
 
@@ -28,19 +28,21 @@ const moduleHref = computed(() =>
     </nav>
     <div class="reading-layout">
         <aside class="reading-sidebar">
-            <details open>
-                <summary>{{ label(frontmatter.module) }} · {{ label(contentType) }}</summary>
-                <nav aria-label="同模块文章">
-                    <a
-                        v-for="article in siblings"
-                        :key="article.url"
-                        :href="withBase(article.url)"
-                        :aria-current="article.title === frontmatter.title ? 'page' : undefined"
-                        >{{ article.title }}</a
-                    >
-                </nav>
-            </details>
-            <a class="text-link" :href="moduleSearchUrl">搜索本模块 ↗</a>
+            <slot name="sidebar">
+                <details open>
+                    <summary>{{ label(frontmatter.module) }} · {{ label(contentType) }}</summary>
+                    <nav aria-label="同模块文章">
+                        <a
+                            v-for="article in siblings"
+                            :key="article.url"
+                            :href="withBase(article.url)"
+                            :aria-current="article.title === frontmatter.title ? 'page' : undefined"
+                            >{{ article.title }}</a
+                        >
+                    </nav>
+                </details>
+                <a class="text-link" :href="moduleSearchUrl">搜索本模块 ↗</a>
+            </slot>
         </aside>
         <article class="reading-paper">
             <div class="reading-meta">
@@ -75,6 +77,10 @@ const moduleHref = computed(() =>
     position: sticky;
     top: 102px;
     font-size: 12px;
+}
+.reading-sidebar {
+    max-height: calc(100vh - 125px);
+    overflow-y: auto;
 }
 .reading-sidebar details {
     margin-bottom: 22px;
@@ -150,6 +156,7 @@ const moduleHref = computed(() =>
     }
     .reading-sidebar {
         position: static;
+        max-height: none;
         border: 1px solid var(--blog-line);
         border-radius: 10px;
         padding: 12px 17px;

@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import { categories, contentTypes, label, modules } from '../../content.config.js';
+import { categories, contentTypes, label, modules } from '../content.js';
 
 const props = defineProps({
     state: { type: Object, required: true },

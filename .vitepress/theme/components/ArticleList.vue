@@ -1,6 +1,6 @@
 <script setup>
 import { withBase } from 'vitepress';
-import { label } from '../../content.config.js';
+import { label } from '../content.js';
 import { searchPath } from '../utils/navigation.js';
 import { searchQuery } from '../utils/search.js';
 

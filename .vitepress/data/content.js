@@ -1,28 +1,44 @@
-import { contentTypes, findModule, tags } from '../content.config.js';
+import { contentTypes } from '../content.config.js';
+
+/** 数组型文章标识统一校验，不要求预先登记标签或知识分支。 */
+function stringList(value, field, url) {
+    if (value === undefined) return [];
+    if (!Array.isArray(value) || value.some(item => typeof item !== 'string' || !item.trim()))
+        throw new Error(`无效的 ${field}：${url}`);
+    return value.map(item => item.trim());
+}
 
 /** 校验并整理单篇文章；正文只在全文索引中输出。 */
 function toArticle(page, includeText) {
     const meta = page.frontmatter;
-    const module = findModule(meta.module);
+    const module = meta.module;
     // 在构建阶段暴露无效引用，避免页面上线后出现缺失分类或无法检索的文章。
-    if (!module || !contentTypes.some(item => item.id === meta.type)) throw new Error(`无效的文章分类：${page.url}`);
+    if (
+        typeof module !== 'string' ||
+        !/^[a-z0-9][a-z0-9_-]*$/.test(module) ||
+        ['index', 'search'].includes(module) ||
+        !contentTypes.some(item => item.id === meta.type)
+    )
+        throw new Error(`无效的文章分类：${page.url}`);
     if (!meta.title || !meta.description) throw new Error(`文章缺少 title 或 description：${page.url}`);
-    const boundTags = meta.tags || [];
-    // 标签必须先在集中字典中注册，文章中重复绑定的标签会在输出时去重。
-    if (!Array.isArray(boundTags) || boundTags.some(id => !tags.some(tag => tag.id === id)))
-        throw new Error(`无效的文章标签：${page.url}`);
-    const relatedModules = meta.relatedModules || [];
-    // 跨技术文章只保留一份正文，通过关联模块扩展检索入口。
-    if (!Array.isArray(relatedModules) || relatedModules.some(id => !findModule(id)))
-        throw new Error(`无效的关联模块：${page.url}`);
-    // 领域从主模块派生；不直接采信文章中另一份可能不一致的领域信息。
+    const boundTags = stringList(meta.tags, 'tags', page.url);
+    const knowledge = stringList(meta.knowledge, 'knowledge', page.url);
+    const relatedModules = stringList(meta.relatedModules, 'relatedModules', page.url);
+    // 保留关联技术元数据，但分类筛选始终以主模块为准。
+    for (const field of ['area', 'group', 'moduleName']) {
+        if (meta[field] !== undefined && (typeof meta[field] !== 'string' || !meta[field].trim()))
+            throw new Error(`无效的 ${field}：${page.url}`);
+    }
     return {
         url: page.url,
         title: meta.title,
         description: meta.description,
         type: meta.type,
-        module: module.id,
-        area: module.area,
+        module,
+        moduleName: meta.moduleName?.trim() || '',
+        area: meta.area?.trim() || '未分类',
+        group: meta.group?.trim() || '',
+        knowledge,
         tags: [...new Set(boundTags)],
         relatedModules,
         // 示例标识供界面展示，order 越小越靠前；未指定时按 0 处理。

@@ -1,5 +1,5 @@
 <script setup>
-import { contentTypes } from '../../../content.config.js';
+import { contentTypes } from '../../content.js';
 import ContentList from '../../components/ContentList.vue';
 import { searchPath } from '../../utils/navigation.js';
 const type = contentTypes.find(item => item.id === 'experience');

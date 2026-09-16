@@ -1,5 +1,4 @@
 import { defineConfig } from 'vitepress';
-import { findModule } from './content.config.js';
 
 // 站点配置入口：控制内容来源、页面信息、构建路径和主题能力。
 export default defineConfig({
@@ -16,10 +15,10 @@ export default defineConfig({
     appearance: true,
     // 将 Markdown 章节标题提取到 page.headers，供阅读页生成本页目录。
     markdown: { headers: true },
-    // 模块页由动态路由生成，显示标题从统一分类配置读取，避免重复维护。
+    // 模块页由文章元数据生成，显示标题由动态路径参数提供。
     transformPageData(page) {
-        // 普通文章不改标题；未找到模块名称时保留 VitePress 已生成的标题。
-        if (page.params?.module) page.title = findModule(page.params.module)?.name || page.title;
+        // 普通文章不改标题；没有显示名称时保留 VitePress 已生成的标题。
+        if (page.params?.module) page.title = page.params.title || page.title;
     },
     // GitHub Pages 提供部署子路径，本地开发默认使用根路径。
     base: `${process.env.PAGES_BASE_PATH || ''}/`,

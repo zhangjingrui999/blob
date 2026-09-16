@@ -1,4 +1,4 @@
-import { contentTypes, findModule, label } from '../../content.config.js';
+import { contentTypes, findModule, label } from '../content.js';
 
 /** 页面类型由元数据确定，查询参数不能改变基础知识或经验分享页面的归属。 */
 export function pageContentType(meta = {}) {

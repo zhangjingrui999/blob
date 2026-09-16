@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { withBase } from 'vitepress';
 import { data as articles } from '../../data/articles.data.js';
-import { label } from '../../content.config.js';
+import { label } from '../content.js';
 import { searchPath } from '../utils/navigation.js';
 import { collectTags, searchQuery } from '../utils/search.js';
 import HomeHero from '../components/HomeHero.vue';

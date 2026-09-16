@@ -1,6 +1,6 @@
 import { computed, onMounted, shallowRef, watch } from 'vue';
 import { useNavigation } from './useNavigation.js';
-import { findModule, label } from '../../content.config.js';
+import { findModule, label } from '../content.js';
 import { data as articles } from '../../data/articles.data.js';
 import { changeFilter, collectTags, emptySearch, searchArticles, selectedModules } from '../utils/search.js';
 

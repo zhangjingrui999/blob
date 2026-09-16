@@ -1,18 +1,19 @@
 <script setup>
 import { withBase } from 'vitepress';
-import { categories, moduleUrl } from '../../content.config.js';
+import { categories, moduleUrl } from '../content.js';
 </script>
 
 <template>
-    <div class="category-grid">
+    <div v-if="categories.length" class="category-grid">
         <section v-for="(area, index) in categories" :key="area.id" class="category-card">
             <div class="category-top">
-                <span class="category-symbol" aria-hidden="true">{{ ['{ }', '&lt;/&gt;', '[ : ]', '>_'][index] }}</span>
+                <span class="category-symbol" aria-hidden="true">{{
+                    ['{ }', '&lt;/&gt;', '[ : ]', '>_'][index % 4]
+                }}</span>
                 <span class="category-number">0{{ index + 1 }}</span>
             </div>
-            <span class="category-code">{{ area.code }}</span>
+            <span class="category-code">KNOWLEDGE</span>
             <h3>{{ area.name }}</h3>
-            <p>{{ area.description }}</p>
             <div class="category-modules">
                 <template v-for="node in area.children" :key="node.id">
                     <div v-if="node.children" class="category-group">
@@ -31,6 +32,7 @@ import { categories, moduleUrl } from '../../content.config.js';
             </div>
         </section>
     </div>
+    <p v-else class="muted">暂无知识内容，分类将在添加文章后自动生成。</p>
 </template>
 
 <style scoped>

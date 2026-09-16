@@ -1,7 +1,7 @@
 <script setup>
 import { computed, nextTick, onMounted, onUnmounted, shallowRef, useTemplateRef, watch } from 'vue';
 import { useData, useRoute, withBase } from 'vitepress';
-import { contentTypes, modules } from '../../content.config.js';
+import { contentTypes, modules } from '../content.js';
 import { useNavigation } from '../composables/useNavigation.js';
 import { pageContentType } from '../utils/navigation.js';
 import SearchForm from './SearchForm.vue';
@@ -72,7 +72,7 @@ function clickBackdrop(event) {
 }
 
 function submit(q) {
-    if (!scopeModules.value.length) {
+    if (modules.length && !scopeModules.value.length) {
         scopeError.value = '请至少选择一个模块。';
         return;
     }

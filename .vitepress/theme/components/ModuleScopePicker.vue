@@ -1,8 +1,8 @@
 <script setup>
-import { categories, modules } from '../../content.config.js';
+import { categories, modules } from '../content.js';
 const props = defineProps({ selected: { type: Array, required: true } });
 const emit = defineEmits(['change']);
-// 模块列表始终来自统一配置，支持跨领域组合而不复制分类数据。
+// 模块列表来自文章索引的统一汇总，支持跨领域组合。
 const groups = categories.map(area => ({ ...area, modules: modules.filter(item => item.area === area.id) }));
 function toggle(id) {
     emit('change', props.selected.includes(id) ? props.selected.filter(item => item !== id) : [...props.selected, id]);
@@ -14,7 +14,7 @@ function toggle(id) {
             <span
                 >模块范围 <small>已选 {{ selected.length }} / {{ modules.length }}</small></span
             >
-            <div class="scope-actions">
+            <div v-if="modules.length" class="scope-actions">
                 <button
                     class="text-link"
                     type="button"
@@ -30,6 +30,7 @@ function toggle(id) {
                 <button class="text-link" type="button" @click="emit('change', [])">清空</button>
             </div>
         </div>
+        <p v-if="!modules.length" class="small muted">暂无文章模块，添加内容后自动显示。</p>
         <div v-for="group in groups" :key="group.id" class="scope-row">
             <span class="scope-name">{{ group.name }}</span>
             <div class="chip-group" role="group" :aria-label="group.name + '模块'">
