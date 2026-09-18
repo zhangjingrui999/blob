@@ -1,4 +1,4 @@
-import { contentTypes } from '../content.config.js';
+import { contentStatusTags, contentTypes } from '../content.config.js';
 
 /** 从已发布文章汇总分类；同一个模块的领域、分组和显示名称必须一致。 */
 export function createCatalog(articles) {
@@ -35,7 +35,9 @@ export function createCatalog(articles) {
         }
         parent.children.push(module);
     }
-    const tags = [...new Set(articles.flatMap(article => article.tags))].map(id => ({ id, name: id }));
+    const tags = [...new Set(articles.flatMap(article => article.tags))].map(
+        id => contentStatusTags.find(tag => tag.id === id) || { id, name: id }
+    );
     const names = [...contentTypes, ...categories, ...modules, ...tags];
     return {
         categories,

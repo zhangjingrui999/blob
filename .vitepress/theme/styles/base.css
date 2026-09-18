@@ -239,6 +239,12 @@ kbd {
     overflow-x: auto;
 }
 
+/* 版本与 API 名称保持可读；窄屏沿用表格自身的横向滚动。 */
+.blog-app .vp-doc h3[id^='版本变化与兼容'] + table :is(th, td) {
+    min-width: 7rem;
+    overflow-wrap: normal;
+}
+
 .blog-app .vp-doc img {
     max-width: 100%;
     height: auto;

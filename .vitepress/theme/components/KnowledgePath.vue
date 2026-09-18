@@ -18,7 +18,6 @@ defineProps({ tree: { type: Object, required: true } });
                 </div>
             </div>
             <KnowledgeTree v-if="stage.children.length" :nodes="stage.children" />
-            <a v-else-if="stage.url" class="text-link" :href="withBase(stage.url)">阅读本主题 →</a>
         </section>
     </div>
     <div v-else class="empty-state">

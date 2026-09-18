@@ -15,6 +15,21 @@ const page = (name, meta = {}) => ({
     frontmatter: { title: name, description: '摘要', type: 'basics', module: 'php', area: '后端', ...meta }
 });
 
+test('状态标签沿用文章筛选，未使用时不生成空标签', () => {
+    assert.deepEqual(createCatalog([]).tags, []);
+    const articles = transformArticles([
+        page('legacy', { tags: ['过时', '废弃', '数组'] }),
+        page('current', { tags: ['数组'] })
+    ]);
+    const tags = createCatalog(articles).tags;
+    assert.deepEqual(
+        tags.map(tag => tag.id),
+        ['数组', '过时', '废弃']
+    );
+    assert.match(tags.find(tag => tag.id === '废弃').description, /不一定已无法运行/);
+    assert.deepEqual(articles.find(article => article.title === 'current').tags, ['数组']);
+});
+
 test('自动收集模块、领域、标签，不需要任何注册清单', () => {
     const articles = transformArticles([
         page('a', { moduleName: 'PHP', tags: ['新标签', '新标签'], knowledge: ['语言基础', '类型系统'] }),

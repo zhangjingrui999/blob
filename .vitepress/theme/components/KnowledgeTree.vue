@@ -19,17 +19,17 @@ function containsCurrent(node) {
         <li v-for="node in nodes" :key="node.id">
             <details v-if="node.children.length" :open="expanded || containsCurrent(node)">
                 <summary>
-                    <span>{{ node.title }}</span>
+                    <!-- 节点名称直接阅读；原生 summary 箭头仍负责展开和收起。 -->
+                    <a
+                        v-if="node.url"
+                        class="node-link"
+                        :href="withBase(node.url)"
+                        :aria-current="currentUrl === node.url ? 'page' : undefined"
+                        >{{ node.title }}</a
+                    >
+                    <span v-else>{{ node.title }}</span>
                     <small>{{ node.children.length }}</small>
                 </summary>
-                <a
-                    v-if="node.url"
-                    class="topic-link"
-                    :href="withBase(node.url)"
-                    :aria-current="currentUrl === node.url ? 'page' : undefined"
-                >
-                    阅读本主题 <span aria-hidden="true">↗</span>
-                </a>
                 <KnowledgeTree
                     :nodes="node.children"
                     :current-url="currentUrl"
@@ -89,8 +89,7 @@ summary small {
     color: var(--blog-muted);
     margin-left: 9px;
 }
-.point-link,
-.topic-link {
+.point-link {
     display: block;
     padding: 8px 10px;
     border-radius: 6px;
@@ -100,10 +99,9 @@ summary small {
 .point-link {
     color: var(--blog-muted);
 }
-.topic-link {
-    font-size: 12px;
-    color: var(--blog-accent);
-    margin-left: 14px;
+.node-link {
+    border-radius: 6px;
+    padding: 4px 2px;
 }
 a:hover,
 a[aria-current] {

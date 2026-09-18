@@ -34,16 +34,15 @@ npm exec -- prettier --write .vitepress/config.mjs
 
 依赖、构建产物、锁文件和本地协作资料不参与格式化。
 
-## 集中管理分类与标签
+## 分类与标签
 
-唯一入口为 `.vitepress/content.config.js`：
+`.vitepress/content.config.js` 保留网站固有配置：
 
 - `contentTypes`：基础知识、经验的显示名称与说明。
-- `categories`：共用分类树，包括领域、可选分组和技术模块。
-- `tags`：标签 ID 与显示名称。
-- `modules`、`allCategories`：从分类树派生，不单独维护。
+- `contentStatusTags`：“过时”“废弃”标签的显示名称与含义。
+- `moduleUrl`：模块入口 URL 规则。
 
-添加模块后，首页入口、筛选、知识模块页面会自动生成。修改显示名称不会改变 URL；修改 ID 则需要同步文章引用并处理旧链接。
+领域、分组、模块和标签从文章元数据自动生成，不需要注册清单。状态标签仅在文章实际使用后出现；正文应说明被标记的版本或 API、替代方向与依据。修改模块显示名称不会改变 URL；修改模块 ID 则需要处理旧链接。
 
 ## 新增文章
 
@@ -55,16 +54,19 @@ title: 文章标题
 description: 一句话摘要
 type: experience
 module: php
+moduleName: PHP
+area: 后端
+group: 语言基础
+knowledge: [Web 基础]
 relatedModules: [redis]
 tags: [缓存, 性能优化]
 order: 10
 ---
 ```
 
-`type`、`module`、`tags`、`relatedModules` 引用集中配置中的 ID。领域由模块派生，不需要重复填写。`relatedModules` 可选；`order`
-越小越靠前。`example: true` 标记示例文章。现有文章均为可替换的入门或场景示例，无虚构发布日期。
+`type` 使用固定内容类型，`module` 使用稳定标识。同模块的领域、分组和显示名称保持一致；`knowledge` 决定知识树路径。`tags` 自由填写，`relatedModules` 可选；`order` 越小越靠前。旧笔记已按基础知识与实践主题整理，保留来源文件名及版本边界，不补造发布日期。
 
-文章必须有标题和摘要。构建时检查无效分类、模块、关联模块和标签引用。未注册标签先加入集中配置，再绑定文章；页面上的候选标签由当前范围内文章自动去重汇总。
+文章必须有标题和摘要。构建时校验元数据格式和模块归属；页面上的候选标签由当前范围内文章自动去重汇总，不需要预先注册。
 
 ## 生成链路与搜索规则
 
